@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TradeIQ — Find the right HS code, documents, and duty cost before you ship</title>
+<meta name="description" content="Look up your product's HS code, the documents customs will ask for, and your estimated export margin — in one workflow, before you commit to a shipment.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --navy: #0A1628;
+    --navy-deep: #060D18;
+    --navy-panel: #0E1C32;
+    --navy-line: rgba(255,255,255,0.08);
+    --orange: #FF6B00;
+    --orange-dim: rgba(255,107,0,0.12);
+    --white: #FFFFFF;
+    --grey: #9AA6B8;
+    --grey-soft: #6E7A8E;
+    --max-w: 1180px;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+
+  body{
+    background: var(--navy);
+    color: var(--white);
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, .logo-text{ font-family: 'Poppins', sans-serif; }
+  .mono{ font-family: 'JetBrains Mono', monospace; }
+
+  a{ text-decoration:none; color:inherit; }
+  img{ max-width:100%; display:block; }
+
+  .wrap{
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+  }
+
+  a:focus-visible, button:focus-visible, input:focus-visible{
+    outline: 2px solid var(--orange);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  /* ===== HEADER ===== */
+  header{
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(6,13,24,0.88);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--navy-line);
+  }
+  .header-inner{
+    max-width: var(--max-w);
+    margin: 0 auto;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding: 16px 24px;
+  }
+  .logo-text{ font-size: 20px; font-weight: 800; letter-spacing: 0.3px; }
+  .logo-text span{ color: var(--orange); }
+  .header-cta{
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--navy);
+    background: var(--orange);
+    padding: 9px 18px;
+    border-radius: 6px;
+    white-space: nowrap;
+    transition: opacity 0.2s ease;
+  }
+  .header-cta:hover{ opacity: 0.88; }
+
+  /* ===== HERO — left-aligned, two column ===== */
+  .hero{
+    position: relative;
+    padding: 76px 24px 70px;
+    border-bottom: 1px solid var(--navy-line);
+  }
+  .hero-inner{
+    max-width: var(--max-w);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: 56px;
+    align-items: center;
+  }
+
+  .eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--grey);
+    margin-bottom: 20px;
+  }
+  .eyebrow .dot{
+    width:6px; height:6px; border-radius:50%;
+    background: var(--orange);
+  }
+
+  .hero h1{
+    font-size: clamp(28px, 3.4vw, 42px);
+    font-weight: 700;
+    line-height: 1.22;
+    letter-spacing: -0.3px;
+    margin-bottom: 20px;
+    max-width: 540px;
+  }
+  .hero h1 em{
+    font-style: normal;
+    color: var(--orange);
+  }
+
+  .hero-sub{
+    font-size: 16px;
+    color: var(--grey);
+    line-height: 1.7;
+    max-width: 480px;
+    margin-bottom: 28px;
+  }
+
+  .hero-actions{
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary{
+    background: var(--orange);
+    color: var(--white);
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 14.5px;
+    font-weight: 700;
+    padding: 13px 24px;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+  }
+  .btn-primary:hover{ transform: translateY(-1px); opacity: 0.92; }
+
+  .hero-note{
+    font-size: 13px;
+    color: var(--grey-soft);
+  }
+
+  /* ----- Product mockup: HS code lookup panel ----- */
+  .mockup{
+    position: relative;
+    background: var(--navy-panel);
+    border: 1px solid var(--navy-line);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 30px 60px -20px rgba(0,0,0,0.5);
+  }
+  .mockup-bar{
+    display:flex;
+    align-items:center;
+    gap: 8px;
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--navy-line);
+    background: rgba(255,255,255,0.02);
+  }
+  .mockup-bar .mdot{ width:8px; height:8px; border-radius:50%; background: rgba(255,255,255,0.15); }
+  .mockup-bar .mlabel{
+    margin-left: 6px;
+    font-size: 11.5px;
+    color: var(--grey-soft);
+    letter-spacing: 0.3px;
+  }
+
+  .mockup-body{ padding: 20px; }
+
+  .mockup-search{
+    display:flex;
+    align-items:center;
+    gap: 10px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--navy-line);
+    border-radius: 8px;
+    padding: 11px 14px;
+    margin-bottom: 16px;
+  }
+  .mockup-search svg{ width:15px; height:15px; stroke: var(--grey-soft); flex-shrink:0; }
+  .mockup-search .typed-text{
+    font-size: 13.5px;
+    color: var(--white);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .mockup-search .cursor{
+    display:inline-block;
+    width: 1px;
+    height: 14px;
+    background: var(--orange);
+    margin-left: 2px;
+    animation: blink 1s steps(1) infinite;
+    vertical-align: middle;
+  }
+  @keyframes blink{ 50%{ opacity:0; } }
+
+  .mockup-result{
+    border: 1px solid var(--navy-line);
+    border-radius: 8px;
+    padding: 14px 16px;
+    background: rgba(255,255,255,0.018);
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .mockup-result.show{ opacity: 1; transform: translateY(0); }
+
+  .mockup-result-top{
+    display:flex;
+    justify-content:space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+  }
+  .hs-code{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 19px;
+    font-weight: 600;
+    color: var(--orange);
+    letter-spacing: 0.5px;
+  }
+  .hs-confidence{
+    font-size: 11px;
+    color: var(--grey-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .hs-desc{
+    font-size: 13px;
+    color: var(--grey);
+    line-height: 1.55;
+    margin-bottom: 14px;
+  }
+
+  .mockup-rows{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .mockup-stat{
+    border-top: 1px solid var(--navy-line);
+    padding-top: 9px;
+  }
+  .mockup-stat .k{ font-size: 10.5px; color: var(--grey-soft); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 3px; }
+  .mockup-stat .v{ font-size: 14px; color: var(--white); font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+
+  .mockup-tags{
+    display:flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .mockup-tag{
+    font-size: 10.5px;
+    color: var(--grey);
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--navy-line);
+    padding: 4px 9px;
+    border-radius: 4px;
+  }
+
+  /* ===== reveal-on-scroll ===== */
+  .reveal{ opacity: 0; transform: translateY(18px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .reveal.is-visible{ opacity: 1; transform: translateY(0); }
+
+  /* ===== SECTION LABEL (used to mark journey stages) ===== */
+  .section-label{
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 12px;
+  }
+
+  /* ===== PROBLEM STRIP ===== */
+  .problem{
+    padding: 64px 24px;
+    border-bottom: 1px solid var(--navy-line);
+  }
+  .problem .wrap{ display:grid; grid-template-columns: 0.85fr 1.15fr; gap: 48px; align-items: start; }
+  .problem h2{
+    font-size: clamp(22px, 2.6vw, 28px);
+    font-weight: 700;
+    line-height: 1.3;
+    max-width: 380px;
+  }
+  .problem-list{ display:flex; flex-direction: column; gap: 20px; }
+  .problem-item{ display:flex; gap: 14px; }
+  .problem-item .num{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--grey-soft);
+    flex-shrink: 0;
+    width: 28px;
+    padding-top: 2px;
+  }
+  .problem-item p{ font-size: 14.5px; color: var(--grey); line-height: 1.65; }
+  .problem-item strong{ color: var(--white); font-weight: 600; }
+
+  /* ===== FEATURES — asymmetric ===== */
+  .features{ padding: 70px 24px 80px; }
+  .features-head{ max-width: 560px; margin-bottom: 36px; }
+  .features-head h2{ font-size: clamp(22px, 2.6vw, 28px); font-weight: 700; margin-bottom: 10px; }
+  .features-head p{ font-size: 14.5px; color: var(--grey); line-height: 1.6; }
+
+  .features-grid{
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 18px;
+  }
+
+  .feature-card{
+    background: var(--navy-panel);
+    border: 1px solid var(--navy-line);
+    border-radius: 12px;
+    padding: 28px;
+    transition: border-color 0.25s ease;
+  }
+  .feature-card:hover{ border-color: rgba(255,107,0,0.4); }
+
+  .feature-card.lead{
+    grid-row: 1 / 3;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .feature-tag{
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--orange);
+    background: var(--orange-dim);
+    padding: 4px 10px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+    width: fit-content;
+  }
+
+  .feature-card h3{
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 9px;
+    letter-spacing: -0.1px;
+  }
+  .feature-card p{
+    font-size: 14px;
+    color: var(--grey);
+    line-height: 1.65;
+  }
+
+  .lead-visual{
+    margin-top: 22px;
+    border: 1px solid var(--navy-line);
+    border-radius: 8px;
+    padding: 14px 16px;
+    background: rgba(255,255,255,0.02);
+  }
+  .lead-visual-row{
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 7px 0;
+    font-size: 12.5px;
+    border-bottom: 1px solid var(--navy-line);
+  }
+  .lead-visual-row:last-child{ border-bottom: none; }
+  .lead-visual-row .label{ color: var(--grey-soft); }
+  .lead-visual-row .val{ font-family: 'JetBrains Mono', monospace; color: var(--white); font-weight: 500; }
+  .lead-visual-row .val.orange{ color: var(--orange); }
+
+  .feature-card.compact{ padding: 24px; }
+  .feature-card.compact .doc-list{ margin-top: 14px; display:flex; flex-direction: column; gap: 8px; }
+  .doc-row{ display:flex; align-items:center; gap: 9px; font-size: 12.5px; color: var(--grey); }
+  .doc-row svg{ width: 14px; height:14px; stroke: var(--orange); flex-shrink:0; }
+
+  /* ===== PROOF / CREDIBILITY ===== */
+  .proof{
+    padding: 60px 24px;
+    border-top: 1px solid var(--navy-line);
+    border-bottom: 1px solid var(--navy-line);
+    background: var(--navy-deep);
+  }
+  .proof .wrap{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: start;
+  }
+  .proof-note{ font-size: 14.5px; color: var(--grey); line-height: 1.75; }
+  .proof-note .who{ color: var(--white); font-weight: 600; }
+  .proof-source{
+    margin-top: 16px;
+    font-size: 12.5px;
+    color: var(--grey-soft);
+    padding-left: 14px;
+    border-left: 2px solid var(--navy-line);
+  }
+
+  .audience-list{ display:flex; flex-direction:column; gap: 14px; }
+  .audience-item{ display:flex; gap: 12px; align-items:flex-start; }
+  .audience-item svg{ width:16px; height:16px; stroke: var(--orange); flex-shrink:0; margin-top:2px; }
+  .audience-item span{ font-size: 14px; color: var(--grey); line-height: 1.5; }
+  .audience-item strong{ color: var(--white); font-weight: 600; }
+
+  /* ===== WAITLIST ===== */
+  .waitlist{ padding: 78px 24px; }
+  .waitlist-inner{
+    max-width: 640px;
+    margin: 0 auto;
+    text-align: left;
+  }
+  .waitlist-inner h2{
+    font-size: clamp(24px, 3vw, 30px);
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .waitlist-inner .sub{
+    font-size: 15px;
+    color: var(--grey);
+    line-height: 1.65;
+    margin-bottom: 28px;
+    max-width: 480px;
+  }
+
+  .waitlist-form{ display:flex; flex-direction: column; gap: 12px; }
+  .form-row{ display:flex; gap: 10px; flex-wrap: wrap; }
+
+  .email-input{
+    flex: 1 1 220px;
+    background: var(--navy-panel);
+    border: 1px solid var(--navy-line);
+    color: var(--white);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    padding: 14px 16px;
+    border-radius: 7px;
+    transition: border-color 0.2s ease;
+  }
+  .email-input::placeholder{ color: var(--grey-soft); }
+  .email-input:focus{ border-color: var(--orange); outline: none; }
+
+  .join-btn{
+    flex: 0 0 auto;
+    background: var(--orange);
+    color: var(--white);
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 14.5px;
+    font-weight: 700;
+    padding: 14px 24px;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+    white-space: nowrap;
+  }
+  .join-btn:hover{ opacity: 0.9; }
+  .join-btn:disabled{ opacity: 0.55; cursor: not-allowed; }
+
+  .form-error{
+    color: #ff8e6b;
+    font-size: 13px;
+    min-height: 18px;
+    display: none;
+  }
+  .form-error.show{ display:block; }
+
+  .success-message{
+    display:none;
+    flex-direction: column;
+    gap: 4px;
+    border-left: 2px solid var(--orange);
+    padding: 4px 0 4px 16px;
+    margin-top: 6px;
+  }
+  .success-message.show{ display:flex; animation: fadeUp 0.4s ease; }
+  @keyframes fadeUp{ from{ opacity:0; transform: translateY(6px); } to{ opacity:1; transform: translateY(0); } }
+  .success-message .line1{ font-size: 14.5px; font-weight: 600; color: var(--white); }
+  .success-message .line2{ font-size: 13px; color: var(--grey-soft); }
+
+  .waitlist-perks{
+    margin-top: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+  .perk{ display:flex; gap: 9px; align-items:flex-start; font-size: 13px; color: var(--grey); }
+  .perk svg{ width:14px; height:14px; stroke: var(--orange); flex-shrink:0; margin-top:2px; }
+
+  /* ===== FOOTER ===== */
+  footer{ padding: 32px 24px; border-top: 1px solid var(--navy-line); }
+  footer .wrap{ display:flex; flex-wrap:wrap; justify-content: space-between; gap: 10px; }
+  footer p{ font-size: 13px; color: var(--grey-soft); line-height: 1.7; }
+  footer a{ color: var(--grey); transition: color 0.2s ease; }
+  footer a:hover{ color: var(--orange); }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 980px){
+    .hero-inner{ grid-template-columns: 1fr; gap: 40px; }
+    .hero h1, .hero-sub{ max-width: none; }
+    .problem .wrap{ grid-template-columns: 1fr; gap: 28px; }
+    .problem h2{ max-width: none; }
+    .proof .wrap{ grid-template-columns: 1fr; gap: 32px; }
+    .features-grid{ grid-template-columns: 1fr; }
+    .feature-card.lead{ grid-row: auto; }
+  }
+
+  @media (max-width: 600px){
+    .header-inner{ padding: 14px 18px; }
+    .hero{ padding: 56px 18px 48px; }
+    .form-row{ flex-direction: column; }
+    .join-btn{ width: 100%; }
+    footer .wrap{ flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header>
+  <div class="header-inner">
+    <div class="logo-text">Trade<span>IQ</span></div>
+    <a href="#waitlist" class="header-cta">Get early access</a>
+  </div>
+</header>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <span class="eyebrow"><span class="dot"></span>In development — not yet live</span>
+
+      <h1>Find the right HS code, documents, and duty cost <em>before you ship</em></h1>
+
+      <p class="hero-sub">One workflow for exporters: look up the correct HS classification, see which documents customs will expect, and check your estimated margin after duty and freight — before you commit to an order.</p>
+
+      <div class="hero-actions">
+        <a href="#waitlist" class="btn-primary">Get early access</a>
+        <span class="hero-note">Free during early access · no credit card</span>
+      </div>
+    </div>
+
+    <div class="mockup reveal">
+      <div class="mockup-bar">
+        <span class="mdot"></span><span class="mdot"></span><span class="mdot"></span>
+        <span class="mlabel mono">tradeiq.in / lookup</span>
+      </div>
+      <div class="mockup-body">
+        <div class="mockup-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <span class="typed-text" id="typedText"></span><span class="cursor"></span>
+        </div>
+        <div class="mockup-result" id="mockupResult">
+          <div class="mockup-result-top">
+            <span class="hs-code">6109.10</span>
+            <span class="hs-confidence">Cotton T-shirts, knitted</span>
+          </div>
+          <p class="hs-desc">Classified under cotton knitwear. Export duty drawback and RoDTEP rate shown below are based on this code.</p>
+          <div class="mockup-rows">
+            <div class="mockup-stat"><div class="k">Export duty</div><div class="v">0%</div></div>
+            <div class="mockup-stat"><div class="k">RoDTEP rate</div><div class="v orange">2.5%</div></div>
+            <div class="mockup-stat"><div class="k">Docs required</div><div class="v">6</div></div>
+            <div class="mockup-stat"><div class="k">Est. margin</div><div class="v orange">14.2%</div></div>
+          </div>
+          <div class="mockup-tags">
+            <span class="mockup-tag">Invoice</span>
+            <span class="mockup-tag">Packing list</span>
+            <span class="mockup-tag">Certificate of Origin</span>
+            <span class="mockup-tag">+3 more</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PROBLEM ===== -->
+<section class="problem">
+  <div class="wrap">
+    <div>
+      <div class="section-label">The problem</div>
+      <h2>Most export delays don't happen at the port. They happen before the shipment is even booked.</h2>
+    </div>
+    <div class="problem-list reveal">
+      <div class="problem-item">
+        <span class="num mono">01</span>
+        <p><strong>Wrong or vague HS code.</strong> A misclassified product means the wrong duty rate, the wrong paperwork, or a customs query that holds up the consignment.</p>
+      </div>
+      <div class="problem-item">
+        <span class="num mono">02</span>
+        <p><strong>Missing documents.</strong> Each product and destination has a different document list — found out, usually, after the freight forwarder asks for something you don't have.</p>
+      </div>
+      <div class="problem-item">
+        <span class="num mono">03</span>
+        <p><strong>Margin discovered too late.</strong> Duty, freight, and compliance costs often get added up after the order is confirmed, not before.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FEATURES (asymmetric) ===== -->
+<section class="features">
+  <div class="wrap">
+    <div class="features-head reveal">
+      <div class="section-label">The workflow</div>
+      <h2>One lookup, three answers</h2>
+      <p>Type your product once. TradeIQ returns the classification, the paperwork, and the cost picture together — instead of three separate searches across customs sites, forwarders, and spreadsheets.</p>
+    </div>
+
+    <div class="features-grid">
+
+      <div class="feature-card lead reveal">
+        <span class="feature-tag">Start here</span>
+        <h3>HS code lookup</h3>
+        <p>Type a product description in plain language. TradeIQ matches it against the customs tariff schedule and returns the applicable HS code, duty rate, and any export incentive (like RoDTEP) tied to that classification.</p>
+        <div class="lead-visual">
+          <div class="lead-visual-row"><span class="label">Input</span><span class="val">"cotton t-shirts, knitted"</span></div>
+          <div class="lead-visual-row"><span class="label">HS code</span><span class="val orange">6109.10</span></div>
+          <div class="lead-visual-row"><span class="label">Duty rate</span><span class="val">0%</span></div>
+        </div>
+      </div>
+
+      <div class="feature-card compact reveal">
+        <h3>Document checklist</h3>
+        <p>The specific documents your product and destination require — not a generic export checklist.</p>
+        <div class="doc-list">
+          <div class="doc-row"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>Commercial invoice</div>
+          <div class="doc-row"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>Certificate of Origin</div>
+          <div class="doc-row"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>Shipping bill</div>
+        </div>
+      </div>
+
+      <div class="feature-card compact reveal">
+        <h3>Margin estimate</h3>
+        <p>See your estimated export margin after duty, documentation cost, and the freight assumptions you enter — before you confirm the order.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===== PROOF / CREDIBILITY ===== -->
+<section class="proof">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="section-label">Who it's for</div>
+      <div class="audience-list">
+        <div class="audience-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          <span><strong>First-time exporters</strong> who need to know what's required before they ship their first order, not after.</span>
+        </div>
+        <div class="audience-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18"></path><path d="M9 21V9"></path></svg>
+          <span><strong>SME manufacturers and traders</strong> handling classification and documentation themselves, without a dedicated compliance team.</span>
+        </div>
+        <div class="audience-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-1"></path><path d="M22 12h-6l-2 3h-4l-2-3H2"></path></svg>
+          <span><strong>Customs and CHA agents</strong> who want a faster reference point for classification before filing.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="reveal">
+      <div class="section-label">Data coverage</div>
+      <p class="proof-note">HS classifications, duty rates, and RoDTEP/RoSCTL rates are mapped against <span class="who">India's customs tariff schedule and DGFT notifications</span>. Document requirements are built from the documentation actually requested for common product–destination combinations, not a generic checklist.</p>
+      <div class="proof-source">TradeIQ is currently in development. Rate and document data is being verified product-category by product-category ahead of launch — this page will be updated with specific coverage as categories go live.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== WAITLIST ===== -->
+<section class="waitlist" id="waitlist">
+  <div class="wrap">
+    <div class="waitlist-inner">
+      <h2>Get early access</h2>
+      <p class="sub">TradeIQ isn't live yet. Leave your email and we'll notify you directly when early access opens — along with which product categories are covered first.</p>
+
+      <form class="waitlist-form" id="waitlistForm" action="https://api.web3forms.com/submit" method="POST" novalidate>
+        <input type="hidden" name="access_key" value="7a5364e3-a278-499e-aa10-719d02b16ca9">
+        <input type="hidden" name="subject" value="New TradeIQ Waitlist Signup">
+        <input type="hidden" name="from_name" value="TradeIQ Website">
+        <input type="hidden" name="redirect" value="false">
+        <div class="form-row">
+          <input
+            type="email"
+            class="email-input"
+            id="emailInput"
+            name="email"
+            placeholder="Enter your business email"
+            aria-label="Business email address"
+            autocomplete="email"
+            required
+          >
+          <button type="submit" class="join-btn" id="joinBtn">Get early access</button>
+        </div>
+        <p class="form-error" id="formError">Please enter a valid email address.</p>
+      </form>
+
+      <div class="success-message" id="successMessage">
+        <span class="line1">You're on the list.</span>
+        <span class="line2">We'll email you when early access opens, along with which HS code categories are covered at launch.</span>
+      </div>
+
+      <div class="waitlist-perks">
+        <div class="perk"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>Early access before public launch</div>
+        <div class="perk"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>Direct line to the team for feedback on your product category</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="wrap">
+    <p>© 2026 TradeIQ — built for Indian exporters</p>
+    <p>
+      <a href="https://thetradeiq.in" target="_blank" rel="noopener">thetradeiq.in</a> &nbsp;·&nbsp;
+      <a href="https://instagram.com/thetrade.iq" target="_blank" rel="noopener">@thetrade.iq</a>
+    </p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- Typed search animation (purposeful, not decorative) ---------- */
+  var typedTextEl = document.getElementById('typedText');
+  var mockupResult = document.getElementById('mockupResult');
+  var phrase = 'cotton t-shirts, knitted';
+  var typed = false;
+
+  function typeOut(){
+    if (typed) return;
+    typed = true;
+    if (prefersReducedMotion){
+      typedTextEl.textContent = phrase;
+      mockupResult.classList.add('show');
+      return;
+    }
+    var i = 0;
+    var interval = setInterval(function(){
+      typedTextEl.textContent = phrase.slice(0, i);
+      i++;
+      if (i > phrase.length){
+        clearInterval(interval);
+        setTimeout(function(){ mockupResult.classList.add('show'); }, 250);
+      }
+    }, 45);
+  }
+
+  var mockupEl = document.querySelector('.mockup');
+  if ('IntersectionObserver' in window){
+    var mockupObserver = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting){
+          typeOut();
+          mockupObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.4 });
+    mockupObserver.observe(mockupEl);
+  } else {
+    typeOut();
+  }
+
+  /* ---------- Scroll reveal ---------- */
+  var revealEls = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window && !prefersReducedMotion){
+    var observer = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting){
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    revealEls.forEach(function(el){ observer.observe(el); });
+  } else {
+    revealEls.forEach(function(el){ el.classList.add('is-visible'); });
+  }
+
+  /* ---------- Waitlist form ---------- */
+  var form = document.getElementById('waitlistForm');
+  var emailInput = document.getElementById('emailInput');
+  var formError = document.getElementById('formError');
+  var successMessage = document.getElementById('successMessage');
+  var joinBtn = document.getElementById('joinBtn');
+
+  var STORAGE_KEY = 'tradeiq_waitlist_emails';
+
+  function saveEmail(email){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      var emails = raw ? JSON.parse(raw) : [];
+      if (emails.indexOf(email) === -1){
+        emails.push(email);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(emails));
+      }
+    } catch(e){ /* localStorage unavailable — fail silently, submission still confirmed in UI */ }
+  }
+
+  function isValidEmail(value){
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+  }
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+
+    var email = emailInput.value.trim();
+
+    if (!isValidEmail(email)){
+      formError.classList.add('show');
+      emailInput.focus();
+      return;
+    }
+
+    formError.classList.remove('show');
+    joinBtn.disabled = true;
+    joinBtn.textContent = 'Joining...';
+
+    var formData = new FormData(form);
+
+    fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      body: formData
+    })
+    .then(function(res){
+      return res.json();
+    })
+    .then(function(data){
+      if(data.success){
+        form.style.display = 'none';
+        successMessage.classList.add('show');
+      } else {
+        joinBtn.disabled = false;
+        joinBtn.textContent = 'Get early access';
+        formError.textContent =
+        'Something went wrong. Please try again.';
+        formError.classList.add('show');
+      }
+    })
+    .catch(function(){
+      joinBtn.disabled = false;
+      joinBtn.textContent = 'Get early access';
+      formError.textContent =
+      'Connection error. Please try again.';
+      formError.classList.add('show');
+    });
+  });
+
+  emailInput.addEventListener('input', function(){
+    if (formError.classList.contains('show')){
+      formError.classList.remove('show');
+    }
+  });
+
+})();
+</script>
+
+</body>
+</html>
